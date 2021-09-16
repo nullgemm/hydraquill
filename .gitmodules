@@ -1,0 +1,6 @@
+[submodule "res/cifra"]
+	path = res/cifra
+	url = https://github.com/ctz/cifra.git
+[submodule "res/zstd"]
+	path = res/zstd
+	url = https://github.com/facebook/zstd.git
