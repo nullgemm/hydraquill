@@ -1,0 +1,10 @@
+bin
+*.o
+*.obj
+makefile_*
+hydraquill_bin_v*
+res/objconv
+res/noto/files
+res/noto/noto*
+valgrind.log
+drmemory.log
