@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get into the script's folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../../..
 
 build=$1
@@ -26,7 +26,7 @@ defines+=("-D_DEFAULT_SOURCE")
 defines+=("-DHYDRAQUILL_PLATFORM_LINUX")
 
 if [ -z "$build" ]; then
-	read -p "select build type (development | release | sanitized): " build
+	read -rp "select build type (development | release | sanitized): " build
 fi
 
 case $build in
@@ -74,18 +74,20 @@ default+=("bin/$name.a")
 default+=("bin/$name.so")
 
 # makefile start
-echo ".POSIX:" > $makefile
-echo "NAME = $name" >> $makefile
-echo "CC = $cc" >> $makefile
+{ \
+echo ".POSIX:"; \
+echo "NAME = $name"; \
+echo "CC = $cc"; \
+} > $makefile
 
 # makefile linking info
 echo "" >> $makefile
-for flag in ${ldflags[@]}; do
+for flag in "${ldflags[@]}"; do
 	echo "LDFLAGS+= $flag" >> $makefile
 done
 
 echo "" >> $makefile
-for flag in ${ldlibs[@]}; do
+for flag in "${ldlibs[@]}"; do
 	echo "LDLIBS+= $flag" >> $makefile
 done
 
@@ -110,7 +112,7 @@ done
 
 # makefile default target
 echo "" >> $makefile
-echo "default: ${default[@]}" >> $makefile
+echo "default:" "${default[@]}" >> $makefile
 
 # makefile library targets
 echo "" >> $makefile
@@ -119,7 +121,7 @@ cat make/lib/templates/targets_linux.make >> $makefile
 # makefile object targets
 echo "" >> $makefile
 for file in "${src[@]}"; do
-	$cc $defines -MM -MG $file >> $makefile
+	$cc "${defines[@]}" -MM -MG "$file" >> $makefile
 done
 
 # makefile extra targets

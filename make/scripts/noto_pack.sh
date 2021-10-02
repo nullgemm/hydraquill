@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # get into the right folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../..
 
 # build the compressed font archive in the resources folder
-cd res/noto/files
+cd res/noto/files || exit
 
 # crawl the fonts to build a file info header
 for f in *; do
@@ -16,7 +16,7 @@ for f in *; do
     printf "%08x" "$size" | xxd -r -p >> ../noto.bin
     printf "%s" "$checksum" | xxd -r -p >> ../noto.bin
     # add the fonts to a temporary blob
-    cat $f >> ../noto_data.bin
+    cat "$f" >> ../noto_data.bin
     # also print those in the terminal
     printf "%-64s %8s %-64s\n" "$f" "$size" "$checksum"
 done

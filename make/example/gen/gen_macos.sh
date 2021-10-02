@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get into the script's folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../../..
 
 build=$1
@@ -35,7 +35,7 @@ flags+=("-Ires/zstd/lib")
 flags+=("-Iexample")
 
 if [ -z "$build" ]; then
-	read -p "select build type (development | release | sanitized): " build
+	read -rp "select build type (development | release | sanitized): " build
 fi
 
 case $build in
@@ -69,7 +69,7 @@ esac
 
 # toolchain type
 if [ -z "$toolchain" ]; then
-	read -p "select target toolchain type (osxcross | native): " toolchain
+	read -rp "select target toolchain type (osxcross | native): " toolchain
 fi
 
 case $toolchain in
@@ -93,7 +93,7 @@ exit 1
 esac
 
 if [ -z "$current_toolchain" ]; then
-	read -p "select current toolchain type (osxcross | native): " current_toolchain
+	read -rp "select current toolchain type (osxcross | native): " current_toolchain
 fi
 
 case $current_toolchain in
@@ -113,7 +113,7 @@ esac
 
 # link type
 if [ -z "$library" ]; then
-	read -p "select library type (static | shared): " library
+	read -rp "select library type (static | shared): " library
 fi
 
 case $library in
@@ -125,7 +125,7 @@ cmd="./$name"
 	shared)
 ldflags+=("-Lhydraquill_bin_$tag/lib/hydraquill/macos")
 ldlibs+=("-l$hydraquill")
-cmd="../make/scripts/dylib_copy.sh "$hydraquill" && ./$name"
+cmd="../make/scripts/dylib_copy.sh $hydraquill && ./$name"
 	;;
 
 	*)
@@ -145,56 +145,58 @@ valgrind+=("--leak-check=full")
 valgrind+=("--suppressions=../res/valgrind.supp")
 
 # makefile start
-echo ".POSIX:" > $makefile
-echo "NAME = $name" >> $makefile
-echo "CMD = $cmd" >> $makefile
-echo "OBJCOPY = $objcopy" >> $makefile
-echo "CC = $cc" >> $makefile
+{ \
+echo ".POSIX:"; \
+echo "NAME = $name"; \
+echo "CMD = $cmd"; \
+echo "OBJCOPY = $objcopy"; \
+echo "CC = $cc"; \
+} > $makefile
 
 # makefile linking info
 echo "" >> $makefile
-for flag in ${ldflags[@]}; do
+for flag in "${ldflags[@]}"; do
 	echo "LDFLAGS+= $flag" >> $makefile
 done
 
 echo "" >> $makefile
-for flag in ${ldlibs[@]}; do
+for flag in "${ldlibs[@]}"; do
 	echo "LDLIBS+= $flag" >> $makefile
 done
 
 # makefile compiler flags
 echo "" >> $makefile
-for flag in ${flags[@]}; do
+for flag in "${flags[@]}"; do
 	echo "CFLAGS+= $flag" >> $makefile
 done
 
 echo "" >> $makefile
-for define in ${defines[@]}; do
+for define in "${defines[@]}"; do
 	echo "CFLAGS+= $define" >> $makefile
 done
 
 # makefile object list
 echo "" >> $makefile
-for file in ${src[@]}; do
+for file in "${src[@]}"; do
 	folder=$(dirname "$file")
 	filename=$(basename "$file" .c)
 	echo "OBJ+= $folder/$filename.o" >> $makefile
 done
 
 echo "" >> $makefile
-for prebuilt in ${obj[@]}; do
+for prebuilt in "${obj[@]}"; do
 	echo "OBJ_EXTRA+= $prebuilt" >> $makefile
 done
 
 # generate valgrind flags
 echo "" >> $makefile
-for flag in ${valgrind[@]}; do
+for flag in "${valgrind[@]}"; do
 	echo "VALGRIND+= $flag" >> $makefile
 done
 
 # makefile default target
 echo "" >> $makefile
-echo "default: ${default[@]}" >> $makefile
+echo "default:" "${default[@]}" >> $makefile
 
 # makefile linux targets
 echo "" >> $makefile
@@ -202,8 +204,8 @@ cat make/example/templates/targets_macos.make >> $makefile
 
 # makefile object targets
 echo "" >> $makefile
-for file in ${src[@]}; do
-	$cch $defines -MM -MG $file >> $makefile
+for file in "${src[@]}"; do
+	$cch "${defines[@]}" -MM -MG "$file" >> $makefile
 done
 
 # makefile extra targets

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get into the script's folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../../..
 
 build=$1
@@ -34,7 +34,7 @@ defines+=("-DCOBJMACROS")
 
 # build type
 if [ -z "$build" ]; then
-	read -p "select build type (development | release): " build
+	read -rp "select build type (development | release): " build
 fi
 
 case $build in
@@ -56,9 +56,11 @@ esac
 default+=("bin/$name.dll")
 
 # makefile start
-echo ".POSIX:" > $makefile
-echo "NAME = $name" >> $makefile
-echo "CC = $cc" >> $makefile
+{ \
+echo ".POSIX:"; \
+echo "NAME = $name"; \
+echo "CC = $cc"; \
+} > $makefile
 
 # makefile linking info
 echo "" >> $makefile
@@ -92,7 +94,7 @@ done
 
 # makefile default target
 echo "" >> $makefile
-echo "default: ${default[@]}" >> $makefile
+echo "default:" "${default[@]}" >> $makefile
 
 # makefile library targets
 echo "" >> $makefile
@@ -101,7 +103,7 @@ cat make/lib/templates/targets_windows_mingw.make >> $makefile
 # makefile object targets
 echo "" >> $makefile
 for file in "${src[@]}"; do
-	$cc $defines -MM -MG $file >> $makefile
+	$cc "${defines[@]}" -MM -MG "$file" >> $makefile
 done
 
 # makefile extra targets

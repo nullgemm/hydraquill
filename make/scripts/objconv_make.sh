@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # get into the right folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../..
 
 rm -rf res/objconv
 mkdir -p res/objconv/tmp
-cd res/objconv/tmp
+cd res/objconv/tmp || exit
 
 echo "# downloading"
 curl \

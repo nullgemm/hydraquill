@@ -1,13 +1,12 @@
 #!/bin/bash
 
 # get into the script's folder
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 cd ../../..
 
 build=$1
 toolchain=$2
 current_toolchain=$3
-library=$4
 
 # library makefile data
 name="hydraquill"
@@ -30,7 +29,7 @@ defines+=("-DHYDRAQUILL_PLATFORM_MACOS")
 
 # build type
 if [ -z "$build" ]; then
-	read -p "select build type (development | release | sanitized): " build
+	read -rp "select build type (development | release | sanitized): " build
 fi
 
 case $build in
@@ -68,19 +67,19 @@ default+=("bin/lib$name.dylib")
 
 # toolchain type
 if [ -z "$toolchain" ]; then
-	read -p "select target toolchain type (osxcross | native): " toolchain
+	read -rp "select target toolchain type (osxcross | native): " toolchain
 fi
 
 case $toolchain in
 	osxcross)
-cc=o64-clang
-ar=x86_64-apple-darwin20.2-ar
+cc="o64-clang"
+ar="x86_64-apple-darwin20.2-ar"
 	;;
 
 	native)
 makefile+="_native"
-cc=clang
-ar=ar
+cc="clang"
+ar="ar"
 	;;
 
 	*)
@@ -90,16 +89,16 @@ exit 1
 esac
 
 if [ -z "$current_toolchain" ]; then
-	read -p "select current toolchain type (osxcross | native): " current_toolchain
+	read -rp "select current toolchain type (osxcross | native): " current_toolchain
 fi
 
 case $current_toolchain in
 	osxcross)
-cch=o64-clang
+cch="o64-clang"
 	;;
 
 	native)
-cch=clang
+cch="clang"
 	;;
 
 	*)
@@ -109,10 +108,12 @@ exit 1
 esac
 
 # makefile start
-echo ".POSIX:" > $makefile
-echo "NAME = $name" >> $makefile
-echo "CC = $cc" >> $makefile
-echo "AR = $ar" >> $makefile
+{ \
+echo ".POSIX:"; \
+echo "NAME = $name"; \
+echo "CC = $cc"; \
+echo "AR = $ar"; \
+} > $makefile
 
 # makefile linking info
 echo "" >> $makefile
@@ -146,7 +147,7 @@ done
 
 # makefile default target
 echo "" >> $makefile
-echo "default: ${default[@]}" >> $makefile
+echo "default:" "${default[@]}" >> $makefile
 
 # makefile library targets
 echo "" >> $makefile
@@ -155,7 +156,7 @@ cat make/lib/templates/targets_macos.make >> $makefile
 # makefile object targets
 echo "" >> $makefile
 for file in "${src[@]}"; do
-	$cch $defines -MM -MG $file >> $makefile
+	$cch "${defines[@]}" -MM -MG "$file" >> $makefile
 done
 
 # makefile extra targets
