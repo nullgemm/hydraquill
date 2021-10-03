@@ -47,6 +47,7 @@ $ver_windows/Include/$ver_windows_sdk/shared\"")
 flags+=("-I\"/c/Program Files (x86)/Microsoft Visual Studio/\
 $ver_visual_studio/BuildTools/VC/Tools/MSVC/$ver_msvc/include\"")
 
+defines+=("-DHYDRAQUILL_PLATFORM_MSVC")
 defines+=("-DUNICODE")
 defines+=("-D_UNICODE")
 defines+=("-DWINVER=0x0A00")
@@ -74,7 +75,8 @@ fi
 
 case $build in
 	development)
-flags+=("-g")
+flags+=("-Z7")
+ldflags+=("-DEBUG:FULL")
 	;;
 
 	release)

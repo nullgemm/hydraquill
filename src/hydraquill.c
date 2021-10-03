@@ -5,17 +5,43 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h> 
-#include <unistd.h>
+
+// platform-specific includes
 
 #if defined(HYDRAQUILL_PLATFORM_LINUX)
+
 #include <endian.h>
+#include <unistd.h>
+#define O_BINARY 0
+
 #elif defined(HYDRAQUILL_PLATFORM_MINGW)
+
 #include "endian_mingw.h"
+#include <unistd.h>
+
 #elif defined(HYDRAQUILL_PLATFORM_MSVC)
+
 #include "endian_msvc.h"
+#include <io.h>       // open, close, read, write, lseek
+#include <stdio.h>    // SEEK_SET
+#include <basetsd.h>  // SSIZE_T
+#include <sys/stat.h> // _S_IREAD, _S_IWRITE
+
+#define ssize_t SSIZE_T
+#define S_IRUSR _S_IREAD
+#define S_IWUSR _S_IWRITE
+#define S_IRGRP 0
+#define S_IROTH 0
+
 #elif defined(HYDRAQUILL_PLATFORM_MACOS)
+
 #include "endian_macos.h"
+#include <unistd.h>
+#define O_BINARY 0
+
 #endif
+
+// default file names
 
 #ifndef HYDRAQUILL_REGISTRY_NAME
 #define HYDRAQUILL_REGISTRY_NAME "reg.bin"
@@ -25,16 +51,14 @@
 #define HYDRAQUILL_TMP_BLOB_NAME "blob.bin"
 #endif
 
+// maximum file name length
+
 #if defined(NAME_MAX)
 #define HYDRAQUILL_NAME_MAX NAME_MAX
 #elif defined(_POSIX_PATH_MAX)
 #define HYDRAQUILL_NAME_MAX _POSIX_PATH_MAX
 #else
 #define HYDRAQUILL_NAME_MAX 1024
-#endif
-
-#ifndef O_BINARY
-#define O_BINARY 0
 #endif
 
 // local

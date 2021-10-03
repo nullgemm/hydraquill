@@ -32,6 +32,7 @@ flags+=("-Ires/cifra/src")
 flags+=("-Ires/zstd/lib")
 flags+=("-Iexample")
 
+defines+=("-DHYDRAQUILL_PLATFORM_MINGW")
 defines+=("-DUNICODE")
 defines+=("-D_UNICODE")
 defines+=("-DWINVER=0x0A00")

@@ -8,15 +8,53 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h> 
+
+// platform-specific includes
+
+#if defined(HYDRAQUILL_PLATFORM_LINUX)
+
+#include <unistd.h>
+#define O_BINARY 0
+
+#elif defined(HYDRAQUILL_PLATFORM_MINGW)
+
 #include <unistd.h>
 
-#ifndef O_BINARY
-#define O_BINARY 0
+#elif defined(HYDRAQUILL_PLATFORM_MSVC)
+
+#include <io.h>       // open, close, read, write, lseek
+#include <stdio.h>    // SEEK_SET
+#include <basetsd.h>  // SSIZE_T
+#include <sys/stat.h> // _S_IREAD, _S_IWRITE
+
+#define ssize_t SSIZE_T
+#define S_IRUSR _S_IREAD
+#define S_IWUSR _S_IWRITE
+#define S_IRGRP 0
+#define S_IROTH 0
+
+#ifdef min
+#undef min
 #endif
+
+#ifdef max
+#undef max
+#endif
+
+#elif defined(HYDRAQUILL_PLATFORM_MACOS)
+
+#include <unistd.h>
+#define O_BINARY 0
+
+#endif
+
+// embedded archive
 
 extern unsigned char noto_beg;
 extern unsigned char noto_end;
 extern unsigned char noto_len;
+
+// use safe min and max for the specific type cifra needs
 
 inline size_t min(size_t x, size_t y)
 {
@@ -38,6 +76,7 @@ inline size_t max(size_t x, size_t y)
 	return y;
 }
 
+// sha256 callback
 enum hydraquill_error sha256(uint8_t* checksum, int font_file)
 {
 	int err;
@@ -69,6 +108,7 @@ enum hydraquill_error sha256(uint8_t* checksum, int font_file)
 	return HYDRAQUILL_ERROR_OK;
 }
 
+// zstd decoding callback (file)
 enum hydraquill_error zstd_decode_file(int output_file, int input_file)
 {
 	ZSTD_DStream* stream = ZSTD_createDStream();
@@ -129,6 +169,7 @@ enum hydraquill_error zstd_decode_file(int output_file, int input_file)
 	return HYDRAQUILL_ERROR_OK;
 }
 
+// zstd decoding callback (buffer)
 enum hydraquill_error zstd_decode_buffer(
 	int output_file,
 	void* input_buffer,

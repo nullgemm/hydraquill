@@ -34,6 +34,8 @@ flags+=("-Ires/cifra/src")
 flags+=("-Ires/zstd/lib")
 flags+=("-Iexample")
 
+defines+=("-DHYDRAQUILL_PLATFORM_MACOS")
+
 if [ -z "$build" ]; then
 	read -rp "select build type (development | release | sanitized): " build
 fi

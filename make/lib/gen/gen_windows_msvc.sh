@@ -37,7 +37,7 @@ $ver_visual_studio/BuildTools/VC/Tools/MSVC/$ver_msvc/include\"")
 
 # library platform
 defines+=("-D_DEFAULT_SOURCE")
-defines+=("-DHYDRAQUILL_PLATFORM_MINGW")
+defines+=("-DHYDRAQUILL_PLATFORM_MSVC")
 defines+=("-DUNICODE")
 defines+=("-D_UNICODE")
 defines+=("-DWINVER=0x0A00")
