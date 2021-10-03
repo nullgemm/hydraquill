@@ -31,7 +31,6 @@ src+=("example/main.c")
 src+=("res/cifra/src/sha256.c")
 src+=("res/cifra/src/blockwise.c")
 src+=("res/zstd/build/single_file_libs/zstddeclib.c")
-obj+=("res/noto/noto_pe.obj")
 
 flags+=("-Zc:inline")
 flags+=("-Ihydraquill_bin_$tag/include")

@@ -48,12 +48,6 @@
 
 #endif
 
-// embedded archive
-
-extern unsigned char noto_beg;
-extern unsigned char noto_end;
-extern unsigned char noto_len;
-
 // use safe min and max for the specific type cifra needs
 
 inline size_t min(size_t x, size_t y)
@@ -169,81 +163,6 @@ enum hydraquill_error zstd_decode_file(int output_file, int input_file)
 	return HYDRAQUILL_ERROR_OK;
 }
 
-// zstd decoding callback (buffer)
-enum hydraquill_error zstd_decode_buffer(
-	int output_file,
-	void* input_buffer,
-	size_t size_buffer)
-{
-	uint8_t* blob = input_buffer;
-	ZSTD_DStream* stream = ZSTD_createDStream();
-	ZSTD_initDStream(stream);
-
-	size_t out_buf_size = ZSTD_DStreamOutSize();
-	void* out_buf = malloc(out_buf_size);
-
-	if (out_buf == NULL)
-	{
-		return HYDRAQUILL_ERROR_ALLOC;
-	}
-
-	size_t in_buf_size = ZSTD_DStreamInSize();
-	void* in_buf = malloc(in_buf_size);
-
-	if (in_buf == NULL)
-	{
-		return HYDRAQUILL_ERROR_ALLOC;
-	}
-
-	size_t read_size;
-	size_t write_size;
-	size_t buf_cur = 0;
-	ZSTD_inBuffer in = {0};
-	ZSTD_outBuffer out = {0};
-
-	do
-	{
-		read_size = size_buffer - buf_cur;
-
-		if (read_size > in_buf_size)
-		{
-			read_size = in_buf_size;
-		}
-
-		memcpy(in_buf, blob + buf_cur, read_size);
-		buf_cur += read_size;
-
-		in.src = in_buf;
-		in.size = read_size;
-		in.pos = 0;
-
-		while (in.pos < in.size)
-		{
-			out.dst = out_buf;
-			out.size = out_buf_size;
-			out.pos = 0;
-
-			ZSTD_decompressStream(stream, &out, &in);
-			write_size = write(output_file, out_buf, out.pos);
-
-			if (write_size < out.pos)
-			{
-				ZSTD_freeDStream(stream);
-				free(out_buf);
-				free(in_buf);
-				return HYDRAQUILL_ERROR_WRITE;
-			}
-		}
-	}
-	while (in.pos > 0);
-
-	ZSTD_freeDStream(stream);
-	free(out_buf);
-	free(in_buf);
-
-	return HYDRAQUILL_ERROR_OK;
-}
-
 int main(void)
 {
 	enum hydraquill_error err;
@@ -267,31 +186,6 @@ int main(void)
 			input_file);
 
 	close(input_file);
-
-	if (err != HYDRAQUILL_ERROR_OK)
-	{
-		printf("%s\n", error_msg[err]);
-		return 1;
-	}
-
-	// check the unpacked font files
-	err = hydraquill_check_fonts(
-		sha256,
-		"./test/");
-
-	if (err != HYDRAQUILL_ERROR_OK)
-	{
-		printf("%s\n", error_msg[err]);
-		return 1;
-	}
-
-	// unpack the embedded blob
-	err =
-		hydraquill_unpack_buffer(
-			zstd_decode_buffer,
-			"./test/",
-			&noto_beg,
-			(size_t) &noto_len);
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{

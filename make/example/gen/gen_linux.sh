@@ -19,7 +19,6 @@ src+=("example/main.c")
 src+=("res/cifra/src/sha256.c")
 src+=("res/cifra/src/blockwise.c")
 src+=("res/zstd/build/single_file_libs/zstddeclib.c")
-obj+=("res/noto/noto.o")
 
 flags+=("-std=c99" "-pedantic")
 flags+=("-Wall" "-Wextra" "-Werror=vla" "-Werror")
