@@ -37,15 +37,6 @@ enum hydraquill_error hydraquill_unpack_file(
 	const char* font_dir,
 	int input_file);
 
-enum hydraquill_error hydraquill_unpack_buffer(
-	enum hydraquill_error (*zstd_decode)(
-		int output_file,
-		void* input_buffer,
-		size_t size_buffer),
-	const char* font_dir,
-	void* input_buffer,
-	size_t size_buffer);
-
 enum hydraquill_error hydraquill_process_fonts(
 	enum hydraquill_error (*font_init)(
 		void* context,

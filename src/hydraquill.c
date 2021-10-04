@@ -620,51 +620,6 @@ enum hydraquill_error hydraquill_unpack_file(
 	return hydraquill_unpack(tmp_path, font_dir, output_file); // infer false positive
 }
 
-enum hydraquill_error hydraquill_unpack_buffer(
-	enum hydraquill_error (*zstd_decode)(
-		int output_file,
-		void* input_buffer,
-		size_t size_buffer),
-	const char* font_dir,
-	void* input_buffer,
-	size_t size_buffer)
-{
-	enum hydraquill_error err;
-	char* tmp_path;
-
-	// build tmp blob path
-	err = build_path(&tmp_path, font_dir, HYDRAQUILL_TMP_BLOB_NAME);
-
-	if (err != HYDRAQUILL_ERROR_OK)
-	{
-		return err;
-	}
-
-	// open the tmp file
-	int output_file = open(
-		tmp_path,
-		O_RDWR | O_CREAT | O_BINARY,
-		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
-	if (output_file < 0)
-	{
-		free(tmp_path);
-		return HYDRAQUILL_ERROR_OPEN;
-	}
-
-	// decode
-	err = zstd_decode(output_file, input_buffer, size_buffer);
-
-	if (err != HYDRAQUILL_ERROR_OK)
-	{
-		close(output_file);
-		free(tmp_path);
-		return err;
-	}
-
-	return hydraquill_unpack(tmp_path, font_dir, output_file); // infer false positive
-}
-
 enum hydraquill_error hydraquill_process_fonts(
 	enum hydraquill_error (*font_init)(
 		void* context,
