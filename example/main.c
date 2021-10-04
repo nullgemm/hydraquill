@@ -126,6 +126,7 @@ enum hydraquill_error zstd_decode_file(int output_file, int input_file)
 
 	if (in_buf == NULL)
 	{
+		free(out_buf);
 		return HYDRAQUILL_ERROR_ALLOC;
 	}
 
