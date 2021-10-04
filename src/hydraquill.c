@@ -489,94 +489,6 @@ void hydraquill_init_errors(char** msg)
 		"could not hash the font file";
 }
 
-enum hydraquill_error hydraquill_check_fonts(
-	enum hydraquill_error (*sha256)(
-		uint8_t* checksum,
-		int font_file),
-	const char* font_dir)
-{
-	enum hydraquill_error err;
-
-	// build the registry path
-	char* reg_path;
-
-	err = build_path(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
-
-	if (err != HYDRAQUILL_ERROR_OK)
-	{
-		return err;
-	}
-
-	// open the registry file
-	int reg_file = open(reg_path, O_RDONLY | O_BINARY);
-
-	if (reg_file < 0)
-	{
-		free(reg_path);
-		return HYDRAQUILL_ERROR_OPEN;
-	}
-
-	// check all the fonts
-	char font_name[HYDRAQUILL_NAME_MAX + 1] = {0};
-	uint8_t font_hash[32] = {0};
-	uint32_t font_size = 0;
-
-	int font_file;
-	char* font_path;
-	enum hydraquill_error hash_valid;
-
-	do
-	{
-		// get info
-		err = get_font_info(reg_file, font_name, font_hash, &font_size);
-
-		if (err != HYDRAQUILL_ERROR_OK)
-		{
-			close(reg_file);
-			free(reg_path);
-
-			if (err == HYDRAQUILL_ERROR_END_OF_REGISTRY)
-			{
-				return HYDRAQUILL_ERROR_OK;
-			}
-
-			return err;
-		}
-
-		// build font path
-		err = build_path(&font_path, font_dir, font_name);
-
-		if (err != HYDRAQUILL_ERROR_OK)
-		{
-			close(reg_file);
-			free(reg_path);
-			return err;
-		}
-
-		// open the font
-		font_file = open(font_path, O_RDONLY | O_BINARY);
-
-		if (font_file < 0)
-		{
-			close(reg_file);
-			free(font_path);
-			free(reg_path);
-			return HYDRAQUILL_ERROR_OPEN;
-		}
-
-		// check the hash
-		hash_valid = sha256(font_hash, font_file);
-
-		close(font_file);
-		free(font_path);
-	}
-	while (hash_valid == HYDRAQUILL_ERROR_OK);
-
-	close(reg_file);
-	free(reg_path);
-	return hash_valid;
-}
-
 enum hydraquill_error hydraquill_unpack_file(
 	enum hydraquill_error (*zstd_decode)(
 		int output_file,
@@ -621,12 +533,99 @@ enum hydraquill_error hydraquill_unpack_file(
 }
 
 enum hydraquill_error hydraquill_process_fonts(
-	enum hydraquill_error (*font_init)(
+	enum hydraquill_error (*font_callback)(
 		void* context,
 		int font_file,
-		char* name),
+		char* font_name,
+		uint8_t* font_hash,
+		uint32_t font_size),
 	const char* font_dir,
 	void* context)
 {
-	return HYDRAQUILL_ERROR_OK;
+	enum hydraquill_error err;
+
+	// build the registry path
+	char* reg_path;
+
+	err = build_path(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
+
+	if (err != HYDRAQUILL_ERROR_OK)
+	{
+		return err;
+	}
+
+	// open the registry file
+	int reg_file = open(reg_path, O_RDONLY | O_BINARY);
+
+	if (reg_file < 0)
+	{
+		free(reg_path);
+		return HYDRAQUILL_ERROR_OPEN;
+	}
+
+	// check all the fonts
+	char font_name[HYDRAQUILL_NAME_MAX + 1] = {0};
+	uint8_t font_hash[32] = {0};
+	uint32_t font_size = 0;
+
+	int font_file;
+	char* font_path;
+	enum hydraquill_error init_valid;
+
+	do
+	{
+		// get info
+		err = get_font_info(reg_file, font_name, font_hash, &font_size);
+
+		if (err != HYDRAQUILL_ERROR_OK)
+		{
+			close(reg_file);
+			free(reg_path);
+
+			if (err == HYDRAQUILL_ERROR_END_OF_REGISTRY)
+			{
+				return HYDRAQUILL_ERROR_OK;
+			}
+
+			return err;
+		}
+
+		// build font path
+		err = build_path(&font_path, font_dir, font_name);
+
+		if (err != HYDRAQUILL_ERROR_OK)
+		{
+			close(reg_file);
+			free(reg_path);
+			return err;
+		}
+
+		// open the font
+		font_file = open(font_path, O_RDONLY | O_BINARY);
+
+		if (font_file < 0)
+		{
+			close(reg_file);
+			free(font_path);
+			free(reg_path);
+			return HYDRAQUILL_ERROR_OPEN;
+		}
+
+		// check the hash
+		init_valid =
+			font_callback(
+				context,
+				font_file,
+				font_name,
+				font_hash,
+				font_size);
+
+		close(font_file);
+		free(font_path);
+	}
+	while (init_valid == HYDRAQUILL_ERROR_OK);
+
+	close(reg_file);
+	free(reg_path);
+	return init_valid;
 }

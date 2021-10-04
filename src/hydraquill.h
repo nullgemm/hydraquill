@@ -24,12 +24,6 @@ enum hydraquill_error
 
 void hydraquill_init_errors(char** msg);
 
-enum hydraquill_error hydraquill_check_fonts(
-	enum hydraquill_error (*sha256)(
-		uint8_t* checksum,
-		int font_file),
-	const char* font_dir);
-
 enum hydraquill_error hydraquill_unpack_file(
 	enum hydraquill_error (*zstd_decode)(
 		int output_file,
@@ -38,10 +32,12 @@ enum hydraquill_error hydraquill_unpack_file(
 	int input_file);
 
 enum hydraquill_error hydraquill_process_fonts(
-	enum hydraquill_error (*font_init)(
+	enum hydraquill_error (*font_callback)(
 		void* context,
 		int font_file,
-		char* name),
+		char* font_name,
+		uint8_t* font_hash,
+		uint32_t font_size),
 	const char* font_dir,
 	void* context);
 

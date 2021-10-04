@@ -70,12 +70,17 @@ inline size_t max(size_t x, size_t y)
 	return y;
 }
 
-// sha256 callback
-enum hydraquill_error sha256(uint8_t* checksum, int font_file)
+// sha256 processing callback
+enum hydraquill_error sha256(
+	void* context,
+	int font_file,
+	char* font_name,
+	uint8_t* font_hash,
+	uint32_t font_size)
 {
 	int err;
 	uint8_t buf[64];
-	uint8_t hash[32] = {0};
+	uint8_t checksum[32] = {0};
 	cf_sha256_context ctx = {0};
 
 	// hash
@@ -89,10 +94,10 @@ enum hydraquill_error sha256(uint8_t* checksum, int font_file)
 	}
 	while (err == 64);
 
-	cf_sha256_digest_final(&ctx, hash);
+	cf_sha256_digest_final(&ctx, checksum);
 
 	// check
-	err = memcmp(hash, checksum, 32);
+	err = memcmp(checksum, font_hash, 32);
 
 	if (err != 0)
 	{
@@ -163,6 +168,7 @@ enum hydraquill_error zstd_decode_file(int output_file, int input_file)
 	return HYDRAQUILL_ERROR_OK;
 }
 
+// example
 int main(void)
 {
 	enum hydraquill_error err;
@@ -194,9 +200,10 @@ int main(void)
 	}
 
 	// check the unpacked font files
-	err = hydraquill_check_fonts(
+	err = hydraquill_process_fonts(
 		sha256,
-		"./test/");
+		"./test/",
+		NULL);
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{
