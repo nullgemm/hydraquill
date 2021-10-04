@@ -1,4 +1,4 @@
-# Hydraquill (WIP)
+# Hydraquill
 Hydraquill is a simple helper library preparing a selection of Noto fonts for
 use with a library like Freetype. Our list only contains the regular-weight
 variable-width sans-serif fonts, which results in 74MiB of raw data for
@@ -39,8 +39,3 @@ Build releases using the scripts in `make/lib/release`,
 or generate makefiles manually using those in `make/lib/gen`.
 The latter can be automated by supplying the configuration options as arguments.
 To build examples generate the makefiles with the scripts in `make/example/gen`.
-
-# Known bugs
-The following bugs are known and not fixed yet (feel free to open a PR):
- - the example for decompressing an archive embedded in the executable does not
-   work under macOS and generates an error.
