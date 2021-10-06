@@ -5,7 +5,9 @@ makefile_*
 hydraquill_bin_v*
 res/objconv
 res/noto/files
+res/noto/licenses
 res/noto/noto*
 res/noto/twemoji.rpm
+res/noto/noto_pack.tar
 valgrind.log
 drmemory.log

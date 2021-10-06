@@ -39,3 +39,31 @@ Build releases using the scripts in `make/lib/release`,
 or generate makefiles manually using those in `make/lib/gen`.
 The latter can be automated by supplying the configuration options as arguments.
 To build examples generate the makefiles with the scripts in `make/example/gen`.
+
+## Testing
+Generate makefiles for the example code using the scripts in `make/example/gen`.
+They are similar to the other makefile generation scripts, and can be automated.
+Build and run the examples like this (you must have built a hydraquill release):
+```
+make -f makefile_example_linux
+make -f makefile_example_linux run
+```
+
+## Generating the font archive
+The font pack is automatically generated when running the example code.
+Please use this approach instead of manually running the necessary scripts:
+it is the best way to make sure the fonts were downloaded and packed correctly.
+If the example program did not print any error message, you can safely use the
+`noto.bin.zst` pack found in your `bin` folder (the original is in `res/noto`).
+
+## Emoji font
+You may have noticed the generated archive is slightly bigger than the announced
+16MiB, and actually weights 19MiB. This is because we do not use the Noto Emoji.
+Instead, we bundle a TTF version of Twitter's "Twemoji" set, converted from SVG
+by some amazing Fedora packagers using Google's Noto font tools.
+Unlike the widespread OTF rendition, which only embeds the original SVG files,
+Fedora's TTF includes actual font outlines, and is thus Freetype-compatible.
+
+## Distributing the font archive
+Please make sure to distribute the required license files with the font pack.
+They are found in `res/noto/licenses` (one is for Noto, the other for Twemoji).
