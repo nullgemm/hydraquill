@@ -10,9 +10,8 @@ fedora="1.fc35"
 mkdir -p res/noto/files
 cd res/noto || exit
 
-curl -L "https://kojipkgs.fedoraproject.org/packages/twitter-twemoji-fonts/"\
-"$version/$fedora/noarch/twitter-twemoji-fonts-"\
-"$version-$fedora.noarch.rpm" -o twemoji.rpm
+curl -L "https://kojipkgs.fedoraproject.org/packages/twitter-twemoji-fonts/$version/$fedora/noarch/twitter-twemoji-fonts-$version-$fedora.noarch.rpm" \
+	-o twemoji.rpm
 
 mkdir -p tmp
 cd tmp || exit
