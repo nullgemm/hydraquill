@@ -48,6 +48,7 @@ Build and run the examples like this (you must have built a hydraquill release):
 make -f makefile_example_linux
 make -f makefile_example_linux run
 ```
+(some underlying scripts depend on bsdtar)
 
 ## Generating the font archive
 The font pack is automatically generated when running the example code.
