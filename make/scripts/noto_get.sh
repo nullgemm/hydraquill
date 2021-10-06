@@ -9,13 +9,14 @@ cd res/noto || exit
 curl -L "https://noto-website-2.storage.googleapis.com/pkgs/Noto-hinted.zip" -o \
 	noto_hinted.zip
 
-mkdir tmp
+mkdir -p tmp
 cd tmp || exit
 unzip ../noto_hinted.zip
 mv ./*Regular.* ../files
 
 cd ..
 rm -rf tmp
+rm files/NotoEmoji*
 rm files/NotoMono*
 rm files/NotoSerif*
 rm files/NotoSansMono*

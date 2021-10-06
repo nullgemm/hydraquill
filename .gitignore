@@ -6,5 +6,6 @@ hydraquill_bin_v*
 res/objconv
 res/noto/files
 res/noto/noto*
+res/noto/twemoji.rpm
 valgrind.log
 drmemory.log

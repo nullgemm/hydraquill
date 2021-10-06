@@ -11,7 +11,7 @@ which is why an archive in this format will be prepared when building examples
 The library also provides a way to confirm the existence of unpacked font files
 and to verify their integrity using sha256 checksums.
 
-# Dependencies
+## Dependencies
 The following dependencies must be provided through callbacks:
  - zstd decoding
  - sha256 hashing
@@ -22,7 +22,7 @@ The example program includes them directly, using:
  - the cifra sha256 implementation,
    found in `res/cifra/src`
 
-# Cloning
+## Cloning
 As hinted above, this repo uses submodules, and should be cloned like this:
 ```
 git clone --recurse-submodules https://github.com/nullgemm/hydraquill.git
@@ -34,7 +34,7 @@ git submodule sync
 git submodule update --init --recursive --remote
 ```
 
-# Compiling
+## Compiling
 Build releases using the scripts in `make/lib/release`,
 or generate makefiles manually using those in `make/lib/gen`.
 The latter can be automated by supplying the configuration options as arguments.
