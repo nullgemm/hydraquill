@@ -71,7 +71,7 @@ struct reg_line
 	struct reg_line* next;
 };
 
-static enum hydraquill_error build_path(
+static enum hydraquill_error path_build(
 	char** out,
 	const char* path,
 	const char* name)
@@ -245,7 +245,7 @@ static enum hydraquill_error hydraquill_unpack(
 	// build the registry path
 	char* reg_path;
 
-	err = build_path(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
+	err = path_build(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{
@@ -330,7 +330,7 @@ static enum hydraquill_error hydraquill_unpack(
 
 		// build font path
 		max = reg_beg->font_size / ((sizeof (int)) * 1024);
-		err = build_path(&font_path, font_dir, reg_beg->font_name);
+		err = path_build(&font_path, font_dir, reg_beg->font_name);
 
 		if (err != HYDRAQUILL_ERROR_OK)
 		{
@@ -494,16 +494,25 @@ enum hydraquill_error hydraquill_unpack_file(
 		int output_file,
 		int input_file),
 	const char* font_dir,
-	int input_file)
+	const char* blob_path)
 {
 	enum hydraquill_error err;
 	char* tmp_path;
 
+	// open the input file
+	int input_file = open(blob_path, O_RDONLY | O_BINARY);
+
+	if (input_file < 0)
+	{
+		return HYDRAQUILL_ERROR_OPEN;
+	}
+
 	// build tmp blob path
-	err = build_path(&tmp_path, font_dir, HYDRAQUILL_TMP_BLOB_NAME);
+	err = path_build(&tmp_path, font_dir, HYDRAQUILL_TMP_BLOB_NAME);
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{
+		close(input_file);
 		return err;
 	}
 
@@ -515,6 +524,7 @@ enum hydraquill_error hydraquill_unpack_file(
 
 	if (output_file < 0)
 	{
+		close(input_file);
 		free(tmp_path);
 		return HYDRAQUILL_ERROR_OPEN;
 	}
@@ -525,6 +535,7 @@ enum hydraquill_error hydraquill_unpack_file(
 	if (err != HYDRAQUILL_ERROR_OK)
 	{
 		close(output_file);
+		close(input_file);
 		free(tmp_path);
 		return err;
 	}
@@ -547,7 +558,7 @@ enum hydraquill_error hydraquill_process_fonts(
 	// build the registry path
 	char* reg_path;
 
-	err = build_path(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
+	err = path_build(&reg_path, font_dir, HYDRAQUILL_REGISTRY_NAME);
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{
@@ -591,7 +602,7 @@ enum hydraquill_error hydraquill_process_fonts(
 		}
 
 		// build font path
-		err = build_path(&font_path, font_dir, font_name);
+		err = path_build(&font_path, font_dir, font_name);
 
 		if (err != HYDRAQUILL_ERROR_OK)
 		{

@@ -178,21 +178,10 @@ int main(void)
 	hydraquill_init_errors(error_msg);
 
 	// unpack the file blob
-	int input_file = open("./noto.bin.zst", O_RDONLY | O_BINARY);
-
-	if (input_file < 0)
-	{
-		printf("could not open the zst archive file\n");
-		return 1;
-	}
-
-	err =
-		hydraquill_unpack_file(
-			zstd_decode_file,
-			"./test/",
-			input_file);
-
-	close(input_file);
+	err = hydraquill_unpack_file(
+		zstd_decode_file,
+		"./test/",
+		"./noto.bin.zst");
 
 	if (err != HYDRAQUILL_ERROR_OK)
 	{

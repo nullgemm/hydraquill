@@ -29,7 +29,7 @@ enum hydraquill_error hydraquill_unpack_file(
 		int output_file,
 		int input_file),
 	const char* font_dir,
-	int input_file);
+	const char* blob_path);
 
 enum hydraquill_error hydraquill_process_fonts(
 	enum hydraquill_error (*font_callback)(
