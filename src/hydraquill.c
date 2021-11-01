@@ -547,7 +547,8 @@ enum hydraquill_error hydraquill_process_fonts(
 	enum hydraquill_error (*font_callback)(
 		void* context,
 		int font_file,
-		char* font_name,
+		const char* font_dir,
+		const char* font_name,
 		uint8_t* font_hash,
 		uint32_t font_size),
 	const char* font_dir,
@@ -627,6 +628,7 @@ enum hydraquill_error hydraquill_process_fonts(
 			font_callback(
 				context,
 				font_file,
+				font_dir,
 				font_name,
 				font_hash,
 				font_size);

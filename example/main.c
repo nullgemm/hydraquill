@@ -48,6 +48,16 @@
 
 #endif
 
+// maximum file name length
+
+#if defined(NAME_MAX)
+#define HYDRAQUILL_NAME_MAX NAME_MAX
+#elif defined(_POSIX_PATH_MAX)
+#define HYDRAQUILL_NAME_MAX _POSIX_PATH_MAX
+#else
+#define HYDRAQUILL_NAME_MAX 1024
+#endif
+
 // use safe min and max for the specific type cifra needs
 
 inline size_t min(size_t x, size_t y)
@@ -74,7 +84,8 @@ inline size_t max(size_t x, size_t y)
 enum hydraquill_error sha256(
 	void* context,
 	int font_file,
-	char* font_name,
+	const char* font_dir,
+	const char* font_name,
 	uint8_t* font_hash,
 	uint32_t font_size)
 {
