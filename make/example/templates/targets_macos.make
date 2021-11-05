@@ -8,6 +8,7 @@ bin/$(NAME): $(OBJ) $(OBJ_EXTRA)
 res/noto/files:
 	make/scripts/noto_get.sh
 	make/scripts/twemoji_get.sh
+	make/scripts/lastresort_get.sh
 
 res/noto/noto.bin.zst: res/noto/files
 	make/scripts/noto_pack.sh
