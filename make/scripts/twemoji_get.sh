@@ -4,21 +4,20 @@
 cd "$(dirname "$0")" || exit
 cd ../..
 
-version="13.1.0"
-fedora="1.fc35"
+version="0.6.0"
+twemoji="13.1.0"
 
 mkdir -p res/noto/files
 mkdir -p res/noto/licenses
 cd res/noto || exit
 
-curl -L "https://kojipkgs.fedoraproject.org/packages/twitter-twemoji-fonts/$version/$fedora/noarch/twitter-twemoji-fonts-$version-$fedora.noarch.rpm" \
-	-o twemoji.rpm
+curl -L "https://github.com/mozilla/twemoji-colr/releases/download/v$version/TwemojiMozilla.ttf" \
+	-o files/Twemoji.ttf
 
-mkdir -p tmp
-cd tmp || exit
-bsdtar -xf ../twemoji.rpm
-mv usr/share/fonts/twemoji/Twemoji.ttf ../files/
-mv usr/share/licenses/twitter-twemoji-fonts/LICENSE-GRAPHICS ../licenses/twemoji_license.txt
+curl -L "https://github.com/twitter/twemoji/archive/refs/tags/v$twemoji.zip" \
+	-o twemoji.zip
 
-cd ..
-rm -rf tmp
+unzip twemoji.zip
+mv twemoji-$twemoji twemoji
+mv twemoji/LICENSE-GRAPHICS licenses/twemoji_license.txt
+rm -rf twemoji
