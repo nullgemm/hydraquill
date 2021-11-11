@@ -9,4 +9,3 @@ release=hydraquill_bin_"$tag"
 
 mkdir -p "$release/lib/hydraquill/windows"
 mv bin/hydraquill.lib "$release"/lib/hydraquill/windows/hydraquill_windows_msvc.lib
-mv bin/hydraquill.dll "$release"/lib/hydraquill/windows/hydraquill_windows_msvc.dll
