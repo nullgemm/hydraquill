@@ -5,6 +5,7 @@ cd "$(dirname "$0")" || exit
 cd ../../..
 
 build=$1
+library=$2
 
 tag=$(git tag --sort v:refname | tail -n 1)
 
@@ -63,11 +64,29 @@ exit 1
 	;;
 esac
 
-# link hydraquill
+# link type
+if [ -z "$library" ]; then
+	read -rp "select library type (static | shared): " library
+fi
+
+case $library in
+	static)
 obj+=("hydraquill_bin_$tag/lib/hydraquill/windows/""$hydraquill""_mingw.a")
+cmd="wine ./$name.exe"
+	;;
+
+	shared)
+obj+=("hydraquill_bin_$tag/lib/hydraquill/windows/""$hydraquill""_mingw.dll.a")
+cmd="../make/scripts/dll_copy.sh ""$hydraquill""_mingw.dll && wine ./$name.exe"
+	;;
+
+	*)
+echo "invalid library type"
+exit 1
+	;;
+esac
 
 # default target
-cmd="../make/scripts/dll_copy.sh ""$hydraquill""_mingw.dll && wine ./$name.exe"
 default+=("bin/\$(NAME)")
 
 # makefile start
